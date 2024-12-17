@@ -1,13 +1,10 @@
-from fastapi import FastAPI, Body, Path, Query, Request, HTTPException, Depends
+from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
-from typing import Optional
 from user_jwt import create_token, validateToken
-from fastapi.security import HTTPBearer
-from bd.database import Session, engine, Base
-from models.movie import Pelicula
-from fastapi.encoders import jsonable_encoder
+from bd.database import  engine, Base
 from routers.movie import routerMovie
+from routers.user import login_user
 
 app1 = FastAPI(
     title="My First FastAPI",
@@ -17,13 +14,15 @@ app1 = FastAPI(
 
 app1.include_router(routerMovie)
 
+app1.include_router(login_user)
+
 Base.metadata.create_all(bind=engine)
 
-
+"""
 class User(BaseModel):
     email: str
     password: str
-
+"""
 
 
 """
@@ -53,8 +52,9 @@ movies = [
         'category': 'Drama'
     },
 ]
-"""    
+""" 
 
+"""
 @app1.post('/login', tags=["Authentication"])
 def login(user: User):
     if user.email == 'ejemplo@mail.com' and user.password == '123456':
@@ -63,6 +63,7 @@ def login(user: User):
         return JSONResponse(content={"message": "User authenticated", "token": token}, status_code=200)
     return JSONResponse(content=(message := {"message": "User not authenticated"}), status_code=401)
 
+"""
 
 @app1.get('/', tags=["Inicio"])
 def read_root():
